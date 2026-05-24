@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <title>family-tree</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <!-- Login overlay (shown until valid session) -->
+    <div id="login-overlay" class="login-overlay hidden" aria-hidden="true">
+      <form id="login-form" class="login-card" autocomplete="off">
+        <h1>family-tree</h1>
+        <p class="login-subtitle">Enter passphrase to continue</p>
+        <input
+          id="passphrase-input"
+          type="password"
+          placeholder="Passphrase"
+          autocomplete="current-password"
+        />
+        <button type="submit">Enter</button>
+        <p id="login-error" class="login-error" role="alert"></p>
+      </form>
+    </div>
+
+    <!-- Top toolbar -->
+    <header id="toolbar" class="toolbar">
+      <div class="toolbar-left">
+        <span class="brand">family-tree</span>
+      </div>
+      <div class="toolbar-center">
+        <input
+          id="search-input"
+          class="search-input"
+          type="search"
+          placeholder="Search names…"
+          aria-label="Search names"
+        />
+      </div>
+      <div class="toolbar-right">
+        <button id="fit-btn" class="toolbar-btn" title="Fit to screen">Fit</button>
+        <button id="lock-btn" class="toolbar-btn" title="Lock and sign out">Lock</button>
+      </div>
+    </header>
+
+    <!-- Viewport (captures pan/zoom). Contains the world (transformed). -->
+    <main id="viewport" class="viewport">
+      <div id="world" class="world">
+        <svg id="connectors" class="connectors" xmlns="http://www.w3.org/2000/svg"></svg>
+        <div id="cards" class="cards"></div>
+      </div>
+    </main>
+
+    <!-- Detail side panel -->
+    <aside id="side-panel" class="side-panel" aria-hidden="true">
+      <button id="panel-close" class="panel-close" title="Close">×</button>
+      <div id="panel-content" class="panel-content"></div>
+    </aside>
+
+    <!-- Legend -->
+    <section id="legend" class="legend">
+      <button id="legend-toggle" class="legend-toggle">Legend</button>
+      <div id="legend-body" class="legend-body hidden">
+        <h4>Card tint</h4>
+        <ul>
+          <li><span class="swatch swatch-male"></span> Male</li>
+          <li><span class="swatch swatch-female"></span> Female</li>
+          <li><span class="swatch swatch-nonbinary"></span> Nonbinary</li>
+          <li><span class="dagger">†</span> Deceased</li>
+        </ul>
+        <h4>Unions</h4>
+        <ul>
+          <li><span class="line line-solid"></span> Married / partnered</li>
+          <li><span class="line line-dashed"></span> Divorced</li>
+          <li><span class="line line-dotted"></span> Widowed</li>
+        </ul>
+        <h4>Parentage</h4>
+        <ul>
+          <li><span class="line line-solid"></span> Biological</li>
+          <li><span class="line line-adoptive"></span> Adoptive / step</li>
+        </ul>
+      </div>
+    </section>
+
+    <script src="./data.js"></script>
+    <script src="./layout.js"></script>
+    <script src="./renderer.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
