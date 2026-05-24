@@ -299,28 +299,6 @@ html, body {
   outline-offset: 2px;
 }
 
-/* Tooltip on hover */
-.card .tooltip {
-  position: absolute;
-  bottom: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%);
-  background: #1a1a1a;
-  color: #fff;
-  padding: 8px 10px;
-  font-size: 12px;
-  border-radius: 6px;
-  width: 220px;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.12s ease;
-  z-index: 50;
-  line-height: 1.35;
-  box-shadow: var(--shadow-lg);
-}
-.card:hover .tooltip { opacity: 1; }
-.card .tooltip:empty { display: none; }
-
 /* ============================================================
    SVG connectors
    ============================================================ */

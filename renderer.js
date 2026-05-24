@@ -75,13 +75,6 @@ const FamilyRenderer = (() => {
       life.textContent = FamilyData.lifespan(person);
       card.appendChild(life);
 
-      if (person.description) {
-        const tip = document.createElement('div');
-        tip.className = 'tooltip';
-        tip.textContent = person.description;
-        card.appendChild(tip);
-      }
-
       card.addEventListener('click', (e) => {
         e.stopPropagation();
         callbacks.onSelectPerson(person.id);
