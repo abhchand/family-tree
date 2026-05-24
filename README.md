@@ -63,6 +63,8 @@ All people and unions live in `data/family.json`. The schema:
     "gender": "male",          // "male" | "female" | "nonbinary"
     "born": "1945-03-12",      // ISO date, or just "1945"
     "died": "2010-11-04",      // optional; presence implies deceased
+    "maidenName": "Krishnan",  // optional; shown in panel as "née Krishnan"
+    "nickname": "Sury",        // optional; shown in panel in quotes
     "description": "Short bio.",
     "photos": ["rajan.jpg", "rajan-young.jpg"],  // optional; filenames under data/images/
     "parents": [

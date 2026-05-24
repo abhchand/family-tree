@@ -270,6 +270,12 @@
     let html = '';
     html += `<img class="panel-photo${person.died ? ' deceased-photo' : ''}" alt="" src="${escapeHtml(FamilyData.photoUrl(person))}" data-fallback-src="${escapeHtml(FamilyData.fallbackPhotoUrl())}">`;
     html += `<h2${person.died ? ' class="deceased-name"' : ''}>${escapeHtml(person.name)}</h2>`;
+
+    const aka = [];
+    if (person.nickname) aka.push(`&ldquo;${escapeHtml(person.nickname)}&rdquo;`);
+    if (person.maidenName) aka.push(`née ${escapeHtml(person.maidenName)}`);
+    if (aka.length) html += `<div class="alt-name">${aka.join(' · ')}</div>`;
+
     html += `<div class="meta">${meta.join(' · ')}</div>`;
     if (person.description) html += `<p>${escapeHtml(person.description)}</p>`;
 
