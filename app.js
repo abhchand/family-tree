@@ -268,7 +268,7 @@
     if (person.died) meta.push('d. ' + FamilyData.formatDate(person.died));
 
     let html = '';
-    html += `<h2>${escapeHtml(person.name)}${person.died ? ' <span class="dagger">†</span>' : ''}</h2>`;
+    html += `<h2${person.died ? ' class="deceased-name"' : ''}>${escapeHtml(person.name)}</h2>`;
     html += `<div class="meta">${meta.join(' · ')}</div>`;
     if (person.description) html += `<p>${escapeHtml(person.description)}</p>`;
 

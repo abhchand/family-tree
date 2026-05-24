@@ -245,8 +245,18 @@ html, body {
 .card[data-gender="nonbinary"]{ background: var(--tint-nonbinary);border-color: var(--border-nonbinary); }
 
 .card.deceased {
-  filter: grayscale(0.5);
-  opacity: 0.85;
+  filter: grayscale(0.85);
+  opacity: 0.55;
+}
+.card.deceased .card-name {
+  font-style: italic;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.panel-content h2.deceased-name {
+  font-style: italic;
+  color: var(--text-muted);
 }
 
 .card-name {
@@ -464,6 +474,7 @@ html, body {
 .swatch-male      { background: var(--tint-male);     border-color: var(--border-male); }
 .swatch-female    { background: var(--tint-female);   border-color: var(--border-female); }
 .swatch-nonbinary { background: var(--tint-nonbinary);border-color: var(--border-nonbinary); }
+.swatch-deceased  { background: #e8e4dd; opacity: 0.55; }
 
 .line {
   display: inline-block;

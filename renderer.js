@@ -68,12 +68,6 @@ const FamilyRenderer = (() => {
       const name = document.createElement('div');
       name.className = 'card-name';
       name.textContent = person.name;
-      if (person.died) {
-        const dag = document.createElement('span');
-        dag.className = 'dagger';
-        dag.textContent = '†';
-        name.appendChild(dag);
-      }
       card.appendChild(name);
 
       const life = document.createElement('div');
