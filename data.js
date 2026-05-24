@@ -126,6 +126,20 @@ const FamilyData = (() => {
     return '';
   }
 
+  const FALLBACK_PHOTO = './data/no-image.jpg';
+  const PHOTOS_DIR = './data/images/';
+
+  // Returns the URL to use for a person's photo. Renderer attaches an
+  // error handler to fall back to the silhouette if the named file is
+  // missing on disk.
+  function photoUrl(person) {
+    return person && person.photo ? PHOTOS_DIR + person.photo : FALLBACK_PHOTO;
+  }
+
+  function fallbackPhotoUrl() {
+    return FALLBACK_PHOTO;
+  }
+
   return {
     load,
     get,
@@ -140,5 +154,7 @@ const FamilyData = (() => {
     findUnionByPartners,
     formatDate,
     lifespan,
+    photoUrl,
+    fallbackPhotoUrl,
   };
 })();

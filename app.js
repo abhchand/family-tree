@@ -268,6 +268,7 @@
     if (person.died) meta.push('d. ' + FamilyData.formatDate(person.died));
 
     let html = '';
+    html += `<img class="panel-photo${person.died ? ' deceased-photo' : ''}" alt="" src="${escapeHtml(FamilyData.photoUrl(person))}" data-fallback-src="${escapeHtml(FamilyData.fallbackPhotoUrl())}">`;
     html += `<h2${person.died ? ' class="deceased-name"' : ''}>${escapeHtml(person.name)}</h2>`;
     html += `<div class="meta">${meta.join(' · ')}</div>`;
     if (person.description) html += `<p>${escapeHtml(person.description)}</p>`;
@@ -310,6 +311,15 @@
     content.innerHTML = html;
     content.querySelectorAll('.person-link').forEach((a) => {
       a.addEventListener('click', () => focusPerson(a.dataset.id));
+    });
+    // Wire the panel photo fallback in case the named file is missing.
+    content.querySelectorAll('.panel-photo').forEach((img) => {
+      img.addEventListener('error', () => {
+        if (!img.dataset.fallback) {
+          img.dataset.fallback = '1';
+          img.src = img.dataset.fallbackSrc;
+        }
+      });
     });
 
     const panel = document.getElementById('side-panel');

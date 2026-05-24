@@ -223,7 +223,7 @@ html, body {
 
 .card {
   position: absolute;
-  width: 160px;
+  width: 200px;
   height: 80px;
   background: var(--bg-card);
   border: 1px solid var(--border);
@@ -231,11 +231,30 @@ html, body {
   box-shadow: var(--shadow);
   padding: 10px 12px;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
   cursor: pointer;
   user-select: none;
   transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.2s ease;
+}
+
+.card-photo {
+  flex: 0 0 auto;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #e8e4dd;
+  border: 1px solid var(--border);
+}
+
+.card-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 .card:hover {
   transform: translateY(-1px);
@@ -259,6 +278,21 @@ html, body {
 .panel-content h2.deceased-name {
   font-style: italic;
   color: var(--text-muted);
+}
+
+.panel-photo {
+  display: block;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin: 0 auto 16px auto;
+  background: #e8e4dd;
+  border: 1px solid var(--border);
+}
+.panel-photo.deceased-photo {
+  filter: grayscale(0.85);
+  opacity: 0.7;
 }
 
 .card-name {

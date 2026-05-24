@@ -65,15 +65,33 @@ const FamilyRenderer = (() => {
       card.style.left = cardLeft(person.id) + 'px';
       card.style.top = cardTop(person.id) + 'px';
 
+      const img = document.createElement('img');
+      img.className = 'card-photo';
+      img.alt = '';
+      img.src = FamilyData.photoUrl(person);
+      // If the named photo is missing, swap to the silhouette once.
+      img.addEventListener('error', () => {
+        if (!img.dataset.fallback) {
+          img.dataset.fallback = '1';
+          img.src = FamilyData.fallbackPhotoUrl();
+        }
+      });
+      card.appendChild(img);
+
+      const text = document.createElement('div');
+      text.className = 'card-text';
+
       const name = document.createElement('div');
       name.className = 'card-name';
       name.textContent = person.name;
-      card.appendChild(name);
+      text.appendChild(name);
 
       const life = document.createElement('div');
       life.className = 'card-life';
       life.textContent = FamilyData.lifespan(person);
-      card.appendChild(life);
+      text.appendChild(life);
+
+      card.appendChild(text);
 
       card.addEventListener('click', (e) => {
         e.stopPropagation();

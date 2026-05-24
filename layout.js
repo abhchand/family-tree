@@ -44,10 +44,10 @@
 
 const FamilyLayout = (() => {
   const ROW_H = 180;        // vertical spacing between generations
-  const CARD_W = 160;       // card pixel width
+  const CARD_W = 200;       // card pixel width
   const CARD_H = 80;        // card pixel height
   const H_GAP = 60;         // horizontal gap between adjacent cards
-  const SLOT_W = CARD_W + H_GAP; // 220 — width of one "slot" left-to-right
+  const SLOT_W = CARD_W + H_GAP; // 260 — width of one "slot" left-to-right
 
   function computeGenerations(data) {
     const gen = {};

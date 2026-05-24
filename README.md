@@ -64,6 +64,7 @@ All people and unions live in `data/family.json`. The schema:
     "born": "1945-03-12",      // ISO date, or just "1945"
     "died": "2010-11-04",      // optional; presence implies deceased
     "description": "Short bio.",
+    "photo": "rajan.jpg",      // optional; filename under data/images/
     "parents": [
       { "id": "p7", "type": "biological" }   // type: biological | adoptive | step
     ]
@@ -73,6 +74,17 @@ All people and unions live in `data/family.json`. The schema:
 
 - The object key (`"p1"`) and `id` must match.
 - A person can have 0, 1, or 2 parents. Mixed types are fine.
+
+### Photos
+
+Drop image files into `data/images/` and reference them by filename in the
+`photo` field. The app fetches `./data/images/<photo>` for each person —
+landscape or portrait JPEG/PNG/WebP all work, and they'll be cropped to a
+circle on the card and side panel.
+
+If `photo` is omitted or the named file is missing, the silhouette at
+`data/no-image.jpg` is used instead. That fallback ships with the app and
+can be replaced with your own placeholder by overwriting the file.
 
 ### Unions
 
