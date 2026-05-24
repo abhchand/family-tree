@@ -64,7 +64,7 @@ All people and unions live in `data/family.json`. The schema:
     "born": "1945-03-12",      // ISO date, or just "1945"
     "died": "2010-11-04",      // optional; presence implies deceased
     "description": "Short bio.",
-    "photo": "rajan.jpg",      // optional; filename under data/images/
+    "photos": ["rajan.jpg", "rajan-young.jpg"],  // optional; filenames under data/images/
     "parents": [
       { "id": "p7", "type": "biological" }   // type: biological | adoptive | step
     ]
@@ -78,11 +78,16 @@ All people and unions live in `data/family.json`. The schema:
 ### Photos
 
 Drop image files into `data/images/` and reference them by filename in the
-`photo` field. The app fetches `./data/images/<photo>` for each person —
-landscape or portrait JPEG/PNG/WebP all work, and they'll be cropped to a
-circle on the card and side panel.
+`photos` array. The app fetches `./data/images/<filename>` for each entry —
+landscape or portrait JPEG/PNG/WebP all work.
 
-If `photo` is omitted or the named file is missing, the silhouette at
+- The **first** entry is the profile photo, shown on the tree card (cropped
+  to a circle) and as the hero image at the top of the side panel.
+- Any **additional** entries appear as a thumbnail grid above the Parents
+  section in the side panel. Clicking a thumbnail opens the full-size image
+  in a new tab.
+
+If `photos` is omitted, empty, or a named file is missing, the silhouette at
 `data/no-image.jpg` is used instead. That fallback ships with the app and
 can be replaced with your own placeholder by overwriting the file.
 

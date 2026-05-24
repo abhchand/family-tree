@@ -129,11 +129,17 @@ const FamilyData = (() => {
   const FALLBACK_PHOTO = './data/no-image.jpg';
   const PHOTOS_DIR = './data/images/';
 
-  // Returns the URL to use for a person's photo. Renderer attaches an
-  // error handler to fall back to the silhouette if the named file is
-  // missing on disk.
+  // The first entry in `photos` is the profile photo. The remaining
+  // entries show up as a thumbnail grid in the side panel.
   function photoUrl(person) {
-    return person && person.photo ? PHOTOS_DIR + person.photo : FALLBACK_PHOTO;
+    const list = person && person.photos;
+    return list && list.length > 0 ? PHOTOS_DIR + list[0] : FALLBACK_PHOTO;
+  }
+
+  function extraPhotoUrls(person) {
+    const list = person && person.photos;
+    if (!list || list.length <= 1) return [];
+    return list.slice(1).map((f) => PHOTOS_DIR + f);
   }
 
   function fallbackPhotoUrl() {
@@ -155,6 +161,7 @@ const FamilyData = (() => {
     formatDate,
     lifespan,
     photoUrl,
+    extraPhotoUrls,
     fallbackPhotoUrl,
   };
 })();

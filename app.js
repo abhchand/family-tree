@@ -273,6 +273,16 @@
     html += `<div class="meta">${meta.join(' · ')}</div>`;
     if (person.description) html += `<p>${escapeHtml(person.description)}</p>`;
 
+    const extras = FamilyData.extraPhotoUrls(person);
+    if (extras.length) {
+      html += '<h3>Photos</h3><div class="photo-grid">';
+      for (const url of extras) {
+        const safe = escapeHtml(url);
+        html += `<a class="photo-thumb" href="${safe}" target="_blank" rel="noopener noreferrer"><img src="${safe}" alt=""></a>`;
+      }
+      html += '</div>';
+    }
+
     const list = (title, items, fmt) => {
       if (!items.length) return '';
       let out = `<h3>${title}</h3><ul>`;
