@@ -10,7 +10,9 @@ const FamilyData = (() => {
   let _data = null;
 
   async function load(path = './data/family.json') {
-    const res = await fetch(path);
+    // Cache-bust so edits to family.json show up on the next page load.
+    const url = path + (path.includes('?') ? '&' : '?') + 't=' + Date.now();
+    const res = await fetch(url, { cache: 'no-store' });
     if (!res.ok) throw new Error(`Failed to load ${path}: ${res.status}`);
     _data = await res.json();
     _data.people = _data.people || {};
