@@ -229,11 +229,11 @@ html, body {
   border: 1px solid var(--border);
   border-radius: 8px;
   box-shadow: var(--shadow);
-  padding: 10px 12px;
+  padding: 0;
+  overflow: hidden;
   display: flex;
   flex-direction: row;
-  align-items: center;
-  gap: 10px;
+  align-items: stretch;
   cursor: pointer;
   user-select: none;
   transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.2s ease;
@@ -241,17 +241,17 @@ html, body {
 
 .card-photo {
   flex: 0 0 auto;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
+  width: 60px;
+  height: 100%;
   object-fit: cover;
   background: #e8e4dd;
-  border: 1px solid var(--border);
+  /* corners clipped by the card's border-radius + overflow: hidden */
 }
 
 .card-text {
   flex: 1 1 auto;
   min-width: 0;
+  padding: 10px 12px;
   display: flex;
   flex-direction: column;
   justify-content: center;
