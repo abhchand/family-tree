@@ -416,7 +416,7 @@
   // -----------------------------------------------------------
   async function startApp() {
     try {
-      const data = await FamilyData.load();
+      const data = await FamilyData.load('./data/data.json');
       const layout = FamilyLayout.compute(data);
       const bounds = FamilyRenderer.render(layout, data, {
         onSelectPerson: focusPerson,

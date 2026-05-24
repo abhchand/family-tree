@@ -112,14 +112,18 @@ const FamilyRenderer = (() => {
     // (one parent in the tree but no union with the other) gets a direct line.
     const handledChildren = new Set();
 
+    // PASS 1: draw marriage lines + union dots, collect crossbar info.
+    // Crossbars need to be processed together so we can stagger overlapping
+    // ones into separate y-channels (otherwise two sibling-groups whose kids
+    // sit on the same row produce crossbars at the same y and visually merge).
+    const groups = [];
     for (const union of data.unions) {
       const [aId, bId] = union.partners;
       if (!positions[aId] || !positions[bId]) continue;
 
-      // Marriage line: from the inner edge of the left card to the inner edge of the right card.
       const left = cardLeft(aId) <= cardLeft(bId) ? aId : bId;
       const right = left === aId ? bId : aId;
-      const lineY = cardCY(left); // both partners on the same generation row
+      const lineY = cardCY(left);
       const lineX1 = cardLeft(left) + CARD_W;
       const lineX2 = cardLeft(right);
 
@@ -130,37 +134,76 @@ const FamilyRenderer = (() => {
       const midX = (lineX1 + lineX2) / 2;
       svg.appendChild(svgEl('circle', { cx: midX, cy: lineY, r: 3 }, 'union-dot'));
 
-      // Children belonging to this exact union (both partners are parents).
       const children = Object.values(data.people).filter((c) => {
         const ids = (c.parents || []).map((pr) => pr.id);
         return union.partners.every((pid) => ids.includes(pid));
       });
       if (children.length === 0) continue;
 
-      // Crossbar y: halfway between parent row bottom and child row top.
       const parentRowBottom = cardTop(left) + CARD_H;
       const childRowTop = cardTop(children[0].id);
-      const crossY = (parentRowBottom + childRowTop) / 2;
+      const xs = children.map((c) => cardCX(c.id));
+      xs.push(midX);
+      const x1 = Math.min(...xs);
+      const x2 = Math.max(...xs);
 
-      // Drop from union midpoint down to crossbar.
+      groups.push({
+        aId, bId, lineY, midX, children, x1, x2,
+        parentRowBottom, childRowTop,
+      });
+    }
+
+    // PASS 2: assign each crossbar a y-channel. Groups sharing the same
+    // generation gap that horizontally overlap go into different channels;
+    // non-overlapping groups all share the centered channel.
+    const CHANNEL_SPACING = 18; // px between adjacent channels
+    const channelOffset = (c) => {
+      if (c === 0) return 0;
+      const step = Math.ceil(c / 2);
+      const sign = c % 2 === 1 ? -1 : 1; // 1=above, 2=below, 3=further above, ...
+      return sign * step * CHANNEL_SPACING;
+    };
+
+    const groupsByGap = new Map();
+    for (const g of groups) {
+      const key = `${g.parentRowBottom}-${g.childRowTop}`;
+      if (!groupsByGap.has(key)) groupsByGap.set(key, []);
+      groupsByGap.get(key).push(g);
+    }
+    for (const list of groupsByGap.values()) {
+      list.sort((a, b) => a.x1 - b.x1);
+      const occupied = []; // occupied[channel] = [[x1, x2], ...]
+      for (const g of list) {
+        let c = 0;
+        while (true) {
+          const ranges = occupied[c] || [];
+          const collides = ranges.some(([rx1, rx2]) => !(g.x2 < rx1 || g.x1 > rx2));
+          if (!collides) {
+            (occupied[c] = occupied[c] || []).push([g.x1, g.x2]);
+            break;
+          }
+          c++;
+        }
+        const center = (g.parentRowBottom + g.childRowTop) / 2;
+        g.crossY = center + channelOffset(c);
+      }
+    }
+
+    // PASS 3: draw the drop, crossbar, and child drops using the channel y.
+    for (const g of groups) {
+      const { aId, bId, lineY, midX, children, x1, x2, crossY } = g;
+
       svg.appendChild(svgEl('line', {
         x1: midX, y1: lineY, x2: midX, y2: crossY,
       }, 'parent-line biological'));
 
-      // Crossbar across all children + the drop x.
-      const xs = children.map((c) => cardCX(c.id));
-      xs.push(midX);
-      const cbX1 = Math.min(...xs);
-      const cbX2 = Math.max(...xs);
       svg.appendChild(svgEl('line', {
-        x1: cbX1, y1: crossY, x2: cbX2, y2: crossY,
+        x1, y1: crossY, x2, y2: crossY,
       }, 'parent-line biological'));
 
-      // Drop from crossbar to each child's top edge.
       for (const child of children) {
         const cx = cardCX(child.id);
         const cyTop = cardTop(child.id);
-        // Connection type: if both refs agree, use that; otherwise note as mixed (still uses biological style if either is biological).
         const refA = child.parents.find((pr) => pr.id === aId);
         const refB = child.parents.find((pr) => pr.id === bId);
         let type = 'biological';
