@@ -218,6 +218,69 @@ const FamilyRenderer = (() => {
       }
     }
 
+    // ---- Collapse pills ----
+    // For each displayed person with hidden relations, draw a small clickable
+    // pill in the appropriate gap. Clicking the pill re-centers the tree on
+    // the person it's attached to, which makes their hidden relations visible.
+    const pills = callbacks.pills || new Map();
+    const PILL_GAP = 14;     // distance from card edge to pill
+    const PILL_H = 22;
+
+    for (const [pid, info] of pills) {
+      if (!positions[pid]) continue;
+      const left = cardLeft(pid);
+      const top = cardTop(pid);
+      const cx = cardCX(pid);
+      const cy = cardCY(pid);
+
+      const makePill = (text, side) => {
+        const pill = document.createElement('button');
+        pill.type = 'button';
+        pill.className = `pill pill-${side}`;
+        pill.textContent = text;
+        pill.title = `Center tree on this person to show ${text}`;
+        pill.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (callbacks.onCenterPerson) callbacks.onCenterPerson(pid);
+        });
+        cardsContainer.appendChild(pill);
+        return pill;
+      };
+
+      if (info.siblings) {
+        const text = `${info.siblings} sibling${info.siblings === 1 ? '' : 's'}`;
+        const pill = makePill(text, 'siblings');
+        // Position pill flush to the right of the card, vertically centered.
+        pill.style.left = (left + CARD_W + PILL_GAP) + 'px';
+        pill.style.top = (cy - PILL_H / 2) + 'px';
+        svg.appendChild(svgEl('line', {
+          x1: left + CARD_W, y1: cy, x2: left + CARD_W + PILL_GAP, y2: cy,
+        }, 'pill-line'));
+      }
+
+      if (info.children) {
+        const text = `${info.children} ${info.children === 1 ? 'child' : 'children'}`;
+        const pill = makePill(text, 'children');
+        pill.style.left = (cx) + 'px';
+        pill.style.top = (top + CARD_H + PILL_GAP) + 'px';
+        pill.style.transform = 'translateX(-50%)';
+        svg.appendChild(svgEl('line', {
+          x1: cx, y1: top + CARD_H, x2: cx, y2: top + CARD_H + PILL_GAP,
+        }, 'pill-line'));
+      }
+
+      if (info.parents) {
+        const text = `${info.parents} parent${info.parents === 1 ? '' : 's'}`;
+        const pill = makePill(text, 'parents');
+        pill.style.left = (cx) + 'px';
+        pill.style.top = (top - PILL_GAP - PILL_H) + 'px';
+        pill.style.transform = 'translateX(-50%)';
+        svg.appendChild(svgEl('line', {
+          x1: cx, y1: top, x2: cx, y2: top - PILL_GAP,
+        }, 'pill-line'));
+      }
+    }
+
     // Any children whose parent-pair didn't form a recorded union: draw a direct line per parent.
     for (const person of Object.values(data.people)) {
       if (handledChildren.has(person.id)) continue;

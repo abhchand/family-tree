@@ -277,6 +277,11 @@
     if (aka.length) html += `<div class="alt-name">${aka.join(' · ')}</div>`;
 
     html += `<div class="meta">${meta.join(' · ')}</div>`;
+
+    if (person.id !== currentRootId) {
+      html += `<p class="center-link-wrap"><a class="center-link" data-center-id="${escapeHtml(person.id)}">Center tree on ${escapeHtml(person.name)} →</a></p>`;
+    }
+
     if (person.description) html += `<p>${escapeHtml(person.description)}</p>`;
 
     const extras = FamilyData.extraPhotoUrls(person);
@@ -327,6 +332,12 @@
     content.innerHTML = html;
     content.querySelectorAll('.person-link').forEach((a) => {
       a.addEventListener('click', () => focusPerson(a.dataset.id));
+    });
+    content.querySelectorAll('.center-link').forEach((a) => {
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        centerOnPerson(a.dataset.centerId);
+      });
     });
     // Wire the panel photo fallback in case the named file is missing.
     content.querySelectorAll('.panel-photo').forEach((img) => {
@@ -412,14 +423,161 @@
   });
 
   // -----------------------------------------------------------
+  // Root + visibility — pick a focal person and filter the tree to
+  // their immediate relations (ancestors, descendants, siblings,
+  // spouses, and spouses-of-those). Everyone else collapses into
+  // clickable "pills" that re-center the tree when tapped.
+  // -----------------------------------------------------------
+
+  let currentRootId = null;
+
+  function getRequestedRootId() {
+    return new URLSearchParams(location.search).get('root');
+  }
+
+  function centerOnPerson(personId) {
+    // Navigate to a clean URL with just ?root=<id>. Full reload keeps the
+    // layout pipeline straightforward — no need to recompute live.
+    const url = new URL(location.href);
+    url.search = '';
+    url.searchParams.set('root', personId);
+    location.href = url.toString();
+  }
+
+  function computeDisplayedSet(data, rootId) {
+    const displayed = new Set();
+    if (!data.people[rootId]) return displayed;
+    displayed.add(rootId);
+
+    // Ancestors via parent chain.
+    (function addAncestors(id, seen = new Set()) {
+      if (seen.has(id)) return;
+      seen.add(id);
+      const p = data.people[id];
+      if (!p || !p.parents) return;
+      for (const pr of p.parents) {
+        if (data.people[pr.id]) {
+          displayed.add(pr.id);
+          addAncestors(pr.id, seen);
+        }
+      }
+    })(rootId);
+
+    // Descendants via children scan.
+    const childrenOf = (id) =>
+      Object.values(data.people).filter(
+        (p) => (p.parents || []).some((pr) => pr.id === id),
+      );
+    (function addDescendants(id, seen = new Set()) {
+      if (seen.has(id)) return;
+      seen.add(id);
+      for (const c of childrenOf(id)) {
+        displayed.add(c.id);
+        addDescendants(c.id, seen);
+      }
+    })(rootId);
+
+    // Siblings of root (share at least one parent).
+    const rootParents = new Set(
+      (data.people[rootId].parents || []).map((pr) => pr.id),
+    );
+    if (rootParents.size > 0) {
+      for (const p of Object.values(data.people)) {
+        if (p.id === rootId) continue;
+        if ((p.parents || []).some((pr) => rootParents.has(pr.id))) {
+          displayed.add(p.id);
+        }
+      }
+    }
+
+    // Spouses of anyone already displayed (single pass — does not chain
+    // through spouses-of-spouses by design).
+    const snapshot = new Set(displayed);
+    for (const id of snapshot) {
+      for (const u of data.unions) {
+        if (!u.partners.includes(id)) continue;
+        for (const pid of u.partners) {
+          if (pid !== id && data.people[pid]) displayed.add(pid);
+        }
+      }
+    }
+
+    return displayed;
+  }
+
+  function computePills(data, displayed) {
+    const pills = new Map();
+    const allPeople = Object.values(data.people);
+
+    for (const id of displayed) {
+      const person = data.people[id];
+      if (!person) continue;
+
+      // Hidden siblings: share at least one parent, not displayed, not self.
+      let hiddenSiblings = 0;
+      const myParents = new Set((person.parents || []).map((pr) => pr.id));
+      if (myParents.size > 0) {
+        for (const p of allPeople) {
+          if (p.id === id) continue;
+          if (displayed.has(p.id)) continue;
+          if ((p.parents || []).some((pr) => myParents.has(pr.id))) {
+            hiddenSiblings++;
+          }
+        }
+      }
+
+      // Hidden children.
+      let hiddenChildren = 0;
+      for (const p of allPeople) {
+        if (displayed.has(p.id)) continue;
+        if ((p.parents || []).some((pr) => pr.id === id)) hiddenChildren++;
+      }
+
+      // Hidden parents (only count parents present in the dataset).
+      const hiddenParents = (person.parents || [])
+        .filter((pr) => data.people[pr.id] && !displayed.has(pr.id))
+        .length;
+
+      if (hiddenSiblings || hiddenChildren || hiddenParents) {
+        pills.set(id, { siblings: hiddenSiblings, children: hiddenChildren, parents: hiddenParents });
+      }
+    }
+    return pills;
+  }
+
+  function filterData(data, displayed) {
+    return {
+      people: Object.fromEntries(
+        Object.entries(data.people).filter(([id]) => displayed.has(id)),
+      ),
+      unions: data.unions.filter(
+        (u) => u.partners.every((pid) => displayed.has(pid)),
+      ),
+    };
+  }
+
+  // -----------------------------------------------------------
   // Boot
   // -----------------------------------------------------------
   async function startApp() {
     try {
       const data = await FamilyData.load('./data/data.json');
-      const layout = FamilyLayout.compute(data);
-      const bounds = FamilyRenderer.render(layout, data, {
+
+      // Resolve root: ?root= overrides, otherwise the first person in JSON.
+      const peopleIds = Object.keys(data.people);
+      const requested = getRequestedRootId();
+      currentRootId =
+        (requested && data.people[requested]) ? requested : peopleIds[0];
+
+      const displayed = computeDisplayedSet(data, currentRootId);
+      const pills = computePills(data, displayed);
+      const visible = filterData(data, displayed);
+
+      const layout = FamilyLayout.compute(visible);
+      const bounds = FamilyRenderer.render(layout, visible, {
         onSelectPerson: focusPerson,
+        onCenterPerson: centerOnPerson,
+        pills,
       });
       layoutData = { layout, bounds };
       fitToScreen();
