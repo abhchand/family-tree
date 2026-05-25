@@ -29,13 +29,21 @@
         <span class="brand">family-tree</span>
       </div>
       <div class="toolbar-center">
-        <input
-          id="search-input"
-          class="search-input"
-          type="search"
-          placeholder="Search names…"
-          aria-label="Search names"
-        />
+        <div class="search-wrap">
+          <input
+            id="search-input"
+            class="search-input"
+            type="search"
+            placeholder="Search names…"
+            aria-label="Search names"
+            autocomplete="off"
+          />
+          <div
+            id="search-results"
+            class="search-results hidden"
+            role="listbox"
+          ></div>
+        </div>
       </div>
       <div class="toolbar-right">
         <button id="fit-btn" class="toolbar-btn" title="Fit to screen">Fit</button>

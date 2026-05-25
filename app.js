@@ -384,35 +384,95 @@
   // Search / highlight
   // -----------------------------------------------------------
   const searchInput = document.getElementById('search-input');
+  const searchResults = document.getElementById('search-results');
+  const MAX_SEARCH_RESULTS = 10;
 
-  function applySearch(q) {
-    const cards = document.querySelectorAll('.card');
-    if (!q || !q.trim()) {
-      cards.forEach((c) => c.classList.remove('match', 'dim'));
-      return [];
-    }
-    const lower = q.trim().toLowerCase();
-    const matches = [];
-    cards.forEach((card) => {
-      const id = card.dataset.personId;
-      const person = FamilyData.getPerson(id);
-      const isMatch = !!(person && person.name.toLowerCase().includes(lower));
-      card.classList.toggle('match', isMatch);
-      card.classList.toggle('dim', !isMatch);
-      if (isMatch) matches.push(id);
-    });
-    return matches;
+  function hideSearchResults() {
+    searchResults.classList.add('hidden');
+    searchResults.innerHTML = '';
   }
 
-  searchInput.addEventListener('input', () => applySearch(searchInput.value));
-  searchInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-      const m = applySearch(searchInput.value);
-      if (m.length === 1) focusPerson(m[0]);
-    } else if (e.key === 'Escape') {
-      searchInput.value = '';
-      applySearch('');
+  function renderSearchResults(q) {
+    if (!q || !q.trim()) {
+      hideSearchResults();
+      return;
     }
+    const lower = q.trim().toLowerCase();
+    const matches = FamilyData.allPeople()
+      .filter((p) => p.name.toLowerCase().includes(lower))
+      .slice(0, MAX_SEARCH_RESULTS);
+
+    searchResults.innerHTML = '';
+    searchResults.classList.remove('hidden');
+
+    if (matches.length === 0) {
+      const empty = document.createElement('div');
+      empty.className = 'search-empty';
+      empty.textContent = 'No results found';
+      searchResults.appendChild(empty);
+      return;
+    }
+
+    for (const person of matches) {
+      const item = document.createElement('button');
+      item.type = 'button';
+      item.className = 'search-result';
+      item.dataset.id = person.id;
+      item.setAttribute('role', 'option');
+
+      const img = document.createElement('img');
+      img.className = 'search-photo';
+      img.alt = '';
+      img.src = FamilyData.photoUrl(person);
+      img.addEventListener('error', () => {
+        if (!img.dataset.fallback) {
+          img.dataset.fallback = '1';
+          img.src = FamilyData.fallbackPhotoUrl();
+        }
+      });
+      item.appendChild(img);
+
+      const text = document.createElement('div');
+      text.className = 'search-text';
+
+      const name = document.createElement('div');
+      name.className = 'search-name';
+      name.textContent = person.name;
+      text.appendChild(name);
+
+      const lifespan = FamilyData.lifespan(person);
+      if (lifespan) {
+        const life = document.createElement('div');
+        life.className = 'search-life';
+        life.textContent = lifespan;
+        text.appendChild(life);
+      }
+
+      item.appendChild(text);
+
+      item.addEventListener('click', () => centerOnPerson(person.id));
+      searchResults.appendChild(item);
+    }
+  }
+
+  searchInput.addEventListener('input', () => renderSearchResults(searchInput.value));
+  searchInput.addEventListener('focus', () => {
+    if (searchInput.value.trim()) renderSearchResults(searchInput.value);
+  });
+  searchInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      searchInput.value = '';
+      hideSearchResults();
+      searchInput.blur();
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      const first = searchResults.querySelector('.search-result');
+      if (first) first.click();
+    }
+  });
+  // Click outside the search area dismisses the dropdown.
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.search-wrap')) hideSearchResults();
   });
 
   // -----------------------------------------------------------
