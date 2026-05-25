@@ -355,6 +355,14 @@ html, body {
   outline-offset: 2px;
 }
 
+/* Root card — the focal person the tree is centered on. Placed after the
+   gender-tint rules so its border-color override wins the cascade. */
+.card.root {
+  border-color: var(--highlight);
+  border-width: 2px;
+  box-shadow: 0 0 0 3px rgba(243, 200, 75, 0.28), var(--shadow-lg);
+}
+
 /* ============================================================
    SVG connectors
    ============================================================ */

@@ -62,6 +62,7 @@ const FamilyRenderer = (() => {
       card.dataset.personId = person.id;
       card.dataset.gender = person.gender || '';
       if (person.died) card.classList.add('deceased');
+      if (callbacks.rootId && person.id === callbacks.rootId) card.classList.add('root');
       card.style.left = cardLeft(person.id) + 'px';
       card.style.top = cardTop(person.id) + 'px';
 

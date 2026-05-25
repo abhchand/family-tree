@@ -578,6 +578,7 @@
         onSelectPerson: focusPerson,
         onCenterPerson: centerOnPerson,
         pills,
+        rootId: currentRootId,
       });
       layoutData = { layout, bounds };
       fitToScreen();
