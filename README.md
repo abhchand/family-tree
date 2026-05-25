@@ -4,13 +4,13 @@ A lightweight, client-side family-tree viewer. Vanilla HTML/CSS/JavaScript — n
 build step, no framework. Drop it on any static host (Netlify, GitHub Pages, S3,
 your own server) and it works.
 
-The tree reads from a single JSON file at `data/family.json`, lays out the
+The tree reads from a single JSON file at `data/data.json`, lays out the
 people on an infinite, pannable, zoomable canvas, and exposes details in a
 side panel when a card is clicked.
 
 ## Run locally
 
-Because the app uses `fetch()` to load `data/family.json`, most browsers block
+Because the app uses `fetch()` to load `data/data.json`, most browsers block
 it when you open `index.html` directly via `file://`. Use any static server:
 
 ```sh
@@ -51,7 +51,7 @@ the data file.
 
 ## Editing the data
 
-All people and unions live in `data/family.json`. The schema:
+All people and unions live in `data/data.json`. The schema:
 
 ### People
 
@@ -146,7 +146,7 @@ needed — it's a flat static site.
 ### Anywhere else
 
 Upload the files as-is — there is no build step. The only requirement is that
-`data/family.json` is reachable at the relative path `./data/family.json` from
+`data/data.json` is reachable at the relative path `./data/data.json` from
 `index.html`.
 
 ## File layout
@@ -160,5 +160,5 @@ family-tree/
 ├── renderer.js      DOM card creation + SVG connector painting
 ├── app.js           auth, camera (pan/zoom), search, side panel, boot
 └── data/
-    └── family.json  the family data
+    └── data.json    the family data
 ```

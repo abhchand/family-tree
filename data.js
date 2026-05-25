@@ -1,7 +1,7 @@
 /* ============================================================
    data.js — JSON loader and lookup helpers.
 
-   All functions here operate on the parsed `family.json` object,
+   All functions here operate on the parsed `data.json` object,
    which has the shape: { people: { id -> person }, unions: [...] }.
    They are intentionally pure (no DOM access).
    ============================================================ */
@@ -9,8 +9,8 @@
 const FamilyData = (() => {
   let _data = null;
 
-  async function load(path = './data/family.json') {
-    // Cache-bust so edits to family.json show up on the next page load.
+  async function load(path = './data/data.json') {
+    // Cache-bust so edits to data.json show up on the next page load.
     const url = path + (path.includes('?') ? '&' : '?') + 't=' + Date.now();
     const res = await fetch(url, { cache: 'no-store' });
     if (!res.ok) throw new Error(`Failed to load ${path}: ${res.status}`);

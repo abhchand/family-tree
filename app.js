@@ -602,7 +602,7 @@
   // -----------------------------------------------------------
   async function startApp() {
     try {
-      const data = await FamilyData.load('./data/data.json');
+      const data = await FamilyData.load();
 
       // Resolve root: ?root= overrides, otherwise the first person in JSON.
       const peopleIds = Object.keys(data.people);
