@@ -90,7 +90,7 @@ landscape or portrait JPEG/PNG/WebP all work.
   in a new tab.
 
 If `photos` is omitted, empty, or a named file is missing, the silhouette at
-`data/no-image.jpg` is used instead. That fallback ships with the app and
+`assets/images/no-image.jpg` is used instead. That fallback ships with the app and
 can be replaced with your own placeholder by overwriting the file.
 
 ### Unions

@@ -126,7 +126,7 @@ const FamilyData = (() => {
     return '';
   }
 
-  const FALLBACK_PHOTO = './data/no-image.jpg';
+  const FALLBACK_PHOTO = './assets/images/no-image.jpg';
   const PHOTOS_DIR = './data/images/';
 
   // The first entry in `photos` is the profile photo. The remaining
