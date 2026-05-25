@@ -7,22 +7,6 @@
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
-    <!-- Login overlay (shown until valid session) -->
-    <div id="login-overlay" class="login-overlay hidden" aria-hidden="true">
-      <form id="login-form" class="login-card" autocomplete="off">
-        <h1>family-tree</h1>
-        <p class="login-subtitle">Enter passphrase to continue</p>
-        <input
-          id="passphrase-input"
-          type="password"
-          placeholder="Passphrase"
-          autocomplete="current-password"
-        />
-        <button type="submit">Enter</button>
-        <p id="login-error" class="login-error" role="alert"></p>
-      </form>
-    </div>
-
     <!-- Top toolbar -->
     <header id="toolbar" class="toolbar">
       <div class="toolbar-left">
@@ -47,7 +31,6 @@
       </div>
       <div class="toolbar-right">
         <button id="fit-btn" class="toolbar-btn" title="Fit to screen">Fit</button>
-        <button id="lock-btn" class="toolbar-btn" title="Lock and sign out">Lock</button>
       </div>
     </header>
 

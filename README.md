@@ -22,33 +22,6 @@ php -S localhost:8080
 
 Then visit `http://localhost:8080`.
 
-## Passphrase
-
-The app is gated by a SHA-256 passphrase stored in `app.js`:
-
-```js
-const PASSPHRASE_HASH = '071c00fa66449df33ffca0f3b71da9f9375eaf8feef471f348c9bac19e6f4914';
-```
-
-That hash corresponds to the demo passphrase **`family2024`**.
-
-To set your own passphrase, compute its SHA-256 hex and paste it in:
-
-```sh
-echo -n "your-new-passphrase" | sha256sum
-# or
-printf '%s' "your-new-passphrase" | shasum -a 256
-```
-
-A successful login stores a 7-day session in `localStorage` so you don't have to
-re-enter the passphrase on every reload. The **Lock** button in the toolbar
-clears the session.
-
-This is a passphrase *gate*, not real security — the hash is shipped to the
-client, so anyone determined enough can dictionary-attack it. Use a passphrase
-you'd be OK with a casual snoop guessing, and don't store anything sensitive in
-the data file.
-
 ## Editing the data
 
 All people and unions live in `data/data.json`. The schema:
@@ -122,7 +95,6 @@ that union's `partners` list.
 | Open details | Click any card |
 | Navigate from panel | Click any linked relative name |
 | Close details | Click the **×**, or click empty canvas |
-| Sign out | **Lock** button |
 
 ## Deploy
 
@@ -153,7 +125,7 @@ Upload the files as-is — there is no build step. The only requirement is that
 
 ```
 family-tree/
-├── index.html       toolbar, viewport, side panel, login overlay
+├── index.html       toolbar, viewport, side panel
 ├── style.css        all styles, theme tokens, responsive rules
 ├── data.js          fetch + lookup helpers (children, spouses, siblings, parents)
 ├── layout.js        generation assignment + recursive subtree layout

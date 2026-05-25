@@ -1,96 +1,8 @@
 /* ============================================================
-   app.js — application entry: auth, camera, search, side panel.
-
-   Passphrase: the default demo passphrase is "family2024".
-   Its SHA-256 (lowercase hex) is stored in PASSPHRASE_HASH below.
-   To set your own, run in a terminal:
-
-     echo -n "your-new-passphrase" | sha256sum
-
-   and paste the resulting hex into PASSPHRASE_HASH.
+   app.js — application entry: camera, search, side panel.
    ============================================================ */
 
 (async function main() {
-  // Precomputed hash of "family2024" — replace this constant to change the passphrase.
-  const PASSPHRASE_HASH =
-    '071c00fa66449df33ffca0f3b71da9f9375eaf8feef471f348c9bac19e6f4914';
-
-  const SESSION_KEY = 'family-tree.session';
-  const SESSION_DAYS = 7;
-
-  // -----------------------------------------------------------
-  // Auth
-  // -----------------------------------------------------------
-  async function sha256Hex(text) {
-    const enc = new TextEncoder().encode(text);
-    const buf = await crypto.subtle.digest('SHA-256', enc);
-    return [...new Uint8Array(buf)]
-      .map((b) => b.toString(16).padStart(2, '0'))
-      .join('');
-  }
-
-  function checkSession() {
-    try {
-      const raw = localStorage.getItem(SESSION_KEY);
-      if (!raw) return false;
-      const s = JSON.parse(raw);
-      if (!s.expiresAt || Date.now() > s.expiresAt) {
-        localStorage.removeItem(SESSION_KEY);
-        return false;
-      }
-      return true;
-    } catch (_) {
-      return false;
-    }
-  }
-
-  function createSession() {
-    const token =
-      (crypto.randomUUID && crypto.randomUUID()) ||
-      Math.random().toString(36).slice(2);
-    const expiresAt = Date.now() + SESSION_DAYS * 24 * 60 * 60 * 1000;
-    localStorage.setItem(SESSION_KEY, JSON.stringify({ token, expiresAt }));
-  }
-
-  function clearSession() {
-    localStorage.removeItem(SESSION_KEY);
-    location.reload();
-  }
-
-  function showLogin() {
-    const o = document.getElementById('login-overlay');
-    o.classList.remove('hidden');
-    o.setAttribute('aria-hidden', 'false');
-    setTimeout(
-      () => document.getElementById('passphrase-input').focus(),
-      50,
-    );
-  }
-
-  function hideLogin() {
-    const o = document.getElementById('login-overlay');
-    o.classList.add('hidden');
-    o.setAttribute('aria-hidden', 'true');
-  }
-
-  document.getElementById('login-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const input = document.getElementById('passphrase-input');
-    const errEl = document.getElementById('login-error');
-    const hash = await sha256Hex(input.value);
-    if (hash === PASSPHRASE_HASH) {
-      errEl.textContent = '';
-      createSession();
-      hideLogin();
-      await startApp();
-    } else {
-      errEl.textContent = 'Incorrect passphrase';
-      input.select();
-    }
-  });
-
-  document.getElementById('lock-btn').addEventListener('click', clearSession);
-
   // -----------------------------------------------------------
   // Camera (pan + zoom) — applied as a CSS transform on #world.
   //
@@ -697,10 +609,5 @@
     }
   }
 
-  if (checkSession()) {
-    hideLogin();
-    await startApp();
-  } else {
-    showLogin();
-  }
+  await startApp();
 })();
