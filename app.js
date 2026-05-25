@@ -545,6 +545,47 @@
     return pills;
   }
 
+  // Pick which side a sibling pill should sit on, then reserve horizontal
+  // padding so it doesn't collide with adjacent cards. We pick the side that
+  // has no union partner (no "line"). When both sides have partners (2+ unions)
+  // we can't avoid a line — default to the right.
+  const SIBLING_PILL_PAD = 100; // ~75px pill + 14px gap + small margin
+
+  function siblingPillSideFromPositions(personId, positions, data) {
+    const pos = positions[personId];
+    if (!pos) return 'right';
+    let hasLeft = false, hasRight = false;
+    for (const u of data.unions) {
+      if (!u.partners.includes(personId)) continue;
+      const otherId = u.partners.find((p) => p !== personId);
+      if (!positions[otherId]) continue;
+      if (positions[otherId].x < pos.x) hasLeft = true;
+      else if (positions[otherId].x > pos.x) hasRight = true;
+    }
+    if (!hasRight) return 'right';
+    if (!hasLeft) return 'left';
+    return 'right';
+  }
+
+  function annotatePillSides(pills, positions, data) {
+    for (const [pid, info] of pills) {
+      if (!info.siblings) continue;
+      info.siblingsSide = siblingPillSideFromPositions(pid, positions, data);
+    }
+  }
+
+  function pillPaddingMap(pills) {
+    const pads = new Map();
+    for (const [pid, info] of pills) {
+      if (!info.siblings) continue;
+      const side = info.siblingsSide || 'right';
+      pads.set(pid, side === 'left'
+        ? { left: SIBLING_PILL_PAD, right: 0 }
+        : { left: 0, right: SIBLING_PILL_PAD });
+    }
+    return pads;
+  }
+
   function filterData(data, displayed) {
     return {
       people: Object.fromEntries(
@@ -573,7 +614,13 @@
       const pills = computePills(data, displayed);
       const visible = filterData(data, displayed);
 
-      const layout = FamilyLayout.compute(visible);
+      // Two-pass layout: the first pass discovers where each card actually
+      // lives, so we can pick the empty side for each sibling pill; the second
+      // pass re-runs with the resulting padding reserved.
+      const probe = FamilyLayout.compute(visible);
+      annotatePillSides(pills, probe.positions, visible);
+      const pillPads = pillPaddingMap(pills);
+      const layout = FamilyLayout.compute(visible, { pillPads });
       const bounds = FamilyRenderer.render(layout, visible, {
         onSelectPerson: focusPerson,
         onCenterPerson: centerOnPerson,

@@ -251,12 +251,22 @@ const FamilyRenderer = (() => {
       if (info.siblings) {
         const text = `${info.siblings} sibling${info.siblings === 1 ? '' : 's'}`;
         const pill = makePill(text, 'siblings');
-        // Position pill flush to the right of the card, vertically centered.
-        pill.style.left = (left + CARD_W + PILL_GAP) + 'px';
         pill.style.top = (cy - PILL_H / 2) + 'px';
-        svg.appendChild(svgEl('line', {
-          x1: left + CARD_W, y1: cy, x2: left + CARD_W + PILL_GAP, y2: cy,
-        }, 'pill-line'));
+        // Place on the side opposite the union partner (set in app.js).
+        if (info.siblingsSide === 'left') {
+          // Anchor by the pill's right edge so we don't need offsetWidth.
+          pill.style.right = '';
+          pill.style.left = (left - PILL_GAP) + 'px';
+          pill.style.transform = 'translateX(-100%)';
+          svg.appendChild(svgEl('line', {
+            x1: left, y1: cy, x2: left - PILL_GAP, y2: cy,
+          }, 'pill-line'));
+        } else {
+          pill.style.left = (left + CARD_W + PILL_GAP) + 'px';
+          svg.appendChild(svgEl('line', {
+            x1: left + CARD_W, y1: cy, x2: left + CARD_W + PILL_GAP, y2: cy,
+          }, 'pill-line'));
+        }
       }
 
       if (info.children) {

@@ -95,9 +95,16 @@ const FamilyLayout = (() => {
     return gen;
   }
 
-  function compute(data) {
+  function compute(data, options = {}) {
     const gen = computeGenerations(data);
     const peopleArr = Object.values(data.people);
+
+    // Per-person horizontal padding to reserve room for a sibling pill that
+    // would otherwise extend into adjacent cards. Only outward-facing pads
+    // are honored — see `getPadL` / `getPadR` below.
+    const pillPads = options.pillPads || new Map();
+    const getPadL = (id) => (pillPads.get(id) && pillPads.get(id).left) || 0;
+    const getPadR = (id) => (pillPads.get(id) && pillPads.get(id).right) || 0;
 
     const childrenOfUnion = (u) =>
       peopleArr
@@ -140,9 +147,11 @@ const FamilyLayout = (() => {
       });
 
       if (unionsList.length === 0) {
+        const pl = getPadL(personId);
+        const pr = getPadR(personId);
         return {
-          positions: { [personId]: { x: 0, y: ySelf } },
-          width: CARD_W,
+          positions: { [personId]: { x: pl, y: ySelf } },
+          width: CARD_W + pl + pr,
         };
       }
 
@@ -172,14 +181,20 @@ const FamilyLayout = (() => {
       // ---------------- single union ----------------
       if (n === 1) {
         const W = blocks[0].blockWidth;
-        const parentSpan = SLOT_W + CARD_W; // 2 cards + 1 gap = 380
-        const totalWidth = Math.max(parentSpan, W);
-        const pairLeft = (totalWidth - parentSpan) / 2;
+        const parentSpan = SLOT_W + CARD_W; // 2 cards + 1 gap
+        // Self sits on the left, partner on the right — only honor outward pads.
+        const padL = getPadL(personId);
+        const padR = getPadR(partners[0]);
+        const paddedSpan = padL + parentSpan + padR;
+        const paddedW = padL + W + padR;
+        const totalWidth = Math.max(paddedSpan, paddedW);
+        const innerWidth = totalWidth - padL - padR;
+        const pairLeft = padL + (innerWidth - parentSpan) / 2;
         const selfX = pairLeft;
         const partnerX = pairLeft + SLOT_W;
         positions[personId] = { x: selfX, y: ySelf };
         positions[partners[0]] = { x: partnerX, y: ySelf };
-        const childOffsetX = (totalWidth - W) / 2;
+        const childOffsetX = padL + (innerWidth - W) / 2;
         for (const [id, p] of Object.entries(blocks[0].positions)) {
           positions[id] = { x: p.x + childOffsetX, y: p.y };
         }
@@ -193,9 +208,12 @@ const FamilyLayout = (() => {
         // Each side's offset from self has to be wide enough to fit its child block.
         const off0 = Math.max(SLOT_W, W0 + H_GAP);
         const off1 = Math.max(SLOT_W, W1 + H_GAP);
-        const partner0X = 0;
-        const selfX = off0;
-        const partner1X = off0 + off1;
+        // partner_0 is the leftmost, partner_1 the rightmost — outward pads only.
+        const padL = getPadL(partners[0]);
+        const padR = getPadR(partners[1]);
+        const partner0X = padL;
+        const selfX = padL + off0;
+        const partner1X = padL + off0 + off1;
         positions[personId] = { x: selfX, y: ySelf };
         positions[partners[0]] = { x: partner0X, y: ySelf };
         positions[partners[1]] = { x: partner1X, y: ySelf };
@@ -211,12 +229,15 @@ const FamilyLayout = (() => {
         for (const [id, p] of Object.entries(blocks[1].positions)) {
           positions[id] = { x: p.x + child1Off, y: p.y };
         }
-        return { positions, width: partner1X + CARD_W };
+        return { positions, width: partner1X + CARD_W + padR };
       }
 
       // ---------------- 3+ unions: chain to the right ----------------
-      let curX = 0;
-      const selfX = 0;
+      // Self anchors the left edge; partners chain rightward.
+      const padL = getPadL(personId);
+      const padR = getPadR(partners[n - 1]);
+      let curX = padL;
+      const selfX = padL;
       positions[personId] = { x: selfX, y: ySelf };
       for (let i = 0; i < n; i++) {
         const Wi = blocks[i].blockWidth;
@@ -229,7 +250,7 @@ const FamilyLayout = (() => {
           positions[id] = { x: p.x + childOffI, y: p.y };
         }
       }
-      return { positions, width: curX + CARD_W };
+      return { positions, width: curX + CARD_W + padR };
     }
 
     // Roots: gen-0 people sorted spine-first (most unions, then most descendants).
