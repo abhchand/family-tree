@@ -31,6 +31,7 @@
       </div>
       <div class="toolbar-right">
         <button id="fit-btn" class="toolbar-btn" title="Fit to screen">Fit</button>
+        <button id="view-toggle-btn" class="toolbar-btn" title="Toggle between tree and table view">View as table</button>
       </div>
     </header>
 
@@ -41,6 +42,25 @@
         <div id="cards" class="cards"></div>
       </div>
     </main>
+
+    <!-- Table view (alternative to the canvas). Hidden by default. -->
+    <section id="table-view" class="table-view hidden">
+      <table id="table-data">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Nickname</th>
+            <th>Maiden Name</th>
+            <th>Gender</th>
+            <th>Birth Date</th>
+            <th>Marriage Date(s)</th>
+            <th>Death Date</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </section>
 
     <!-- Detail side panel -->
     <aside id="side-panel" class="side-panel" aria-hidden="true">

@@ -114,6 +114,8 @@
   // Fit to screen + pan to a specific person.
   // -----------------------------------------------------------
   let layoutData = null;
+  let currentDisplayed = null; // Set<personId> of currently-visible members
+  let viewMode = 'tree';       // 'tree' | 'table'
 
   function fitToScreen() {
     if (!layoutData) return;
@@ -395,6 +397,83 @@
   });
 
   // -----------------------------------------------------------
+  // Table view — same set of people as the canvas, rendered as rows.
+  // -----------------------------------------------------------
+  function appendCell(row, text, extraClass) {
+    const td = document.createElement('td');
+    if (text === '' || text == null) {
+      td.classList.add('empty');
+      td.textContent = '—';
+    } else {
+      td.textContent = text;
+    }
+    if (extraClass) td.classList.add(extraClass);
+    row.appendChild(td);
+    return td;
+  }
+
+  function renderTable() {
+    const tbody = document.getElementById('table-body');
+    tbody.innerHTML = '';
+    if (!currentDisplayed) return;
+
+    // Sort by birth year (oldest first); people without a `born` go last by
+    // name so the table stays deterministic.
+    const people = [...currentDisplayed]
+      .map((id) => FamilyData.getPerson(id))
+      .filter(Boolean)
+      .sort((a, b) => {
+        const ay = (a.born || '￿');
+        const by = (b.born || '￿');
+        if (ay !== by) return ay.localeCompare(by);
+        return a.name.localeCompare(b.name);
+      });
+
+    for (const p of people) {
+      const row = document.createElement('tr');
+      appendCell(row, p.name);
+      appendCell(row, p.nickname || '');
+      appendCell(row, p.maidenName || '');
+      appendCell(row, p.gender ? cap(p.gender) : '');
+      appendCell(row, p.born ? FamilyData.formatDate(p.born) : '');
+
+      // All marriages this person is part of — even unions whose other
+      // partner is currently hidden — joined on newlines (the cell uses
+      // `white-space: pre-line` so they stack vertically).
+      const marriages = FamilyData.getUnionsFor(p.id)
+        .map((u) => u.married && FamilyData.formatDate(u.married))
+        .filter(Boolean);
+      appendCell(row, marriages.join('\n'));
+
+      appendCell(row, p.died ? FamilyData.formatDate(p.died) : '');
+      appendCell(row, p.description || '', 'description');
+
+      tbody.appendChild(row);
+    }
+  }
+
+  function setViewMode(mode) {
+    viewMode = mode;
+    const viewport = document.getElementById('viewport');
+    const tableView = document.getElementById('table-view');
+    const btn = document.getElementById('view-toggle-btn');
+    if (mode === 'table') {
+      viewport.classList.add('hidden');
+      tableView.classList.remove('hidden');
+      btn.textContent = 'View as tree';
+      renderTable();
+    } else {
+      tableView.classList.add('hidden');
+      viewport.classList.remove('hidden');
+      btn.textContent = 'View as table';
+    }
+  }
+
+  document.getElementById('view-toggle-btn').addEventListener('click', () => {
+    setViewMode(viewMode === 'tree' ? 'table' : 'tree');
+  });
+
+  // -----------------------------------------------------------
   // Root + visibility — pick a focal person and filter the tree to
   // their immediate relations (ancestors, descendants, siblings,
   // spouses, and spouses-of-those). Everyone else collapses into
@@ -583,6 +662,7 @@
         (requested && data.people[requested]) ? requested : peopleIds[0];
 
       const displayed = computeDisplayedSet(data, currentRootId);
+      currentDisplayed = displayed;
       const pills = computePills(data, displayed);
       const visible = filterData(data, displayed);
 

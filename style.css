@@ -215,6 +215,70 @@ html, body {
 .cards { position: absolute; top: 0; left: 0; }
 
 /* ============================================================
+   Table view (toggleable alternative to the canvas)
+   ============================================================ */
+
+.table-view {
+  position: fixed;
+  top: var(--toolbar-h);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: auto;
+  background: var(--bg);
+  padding: 24px;
+}
+
+.table-view table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  font-size: 13px;
+}
+
+.table-view thead th {
+  position: sticky;
+  top: 0;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  padding: 10px 12px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  font-weight: 600;
+  white-space: nowrap;
+  z-index: 1;
+}
+
+.table-view tbody td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  color: var(--text);
+  white-space: pre-line; /* let multi-line cells (marriages) render newlines */
+}
+
+.table-view tbody tr:last-child td { border-bottom: none; }
+.table-view tbody tr:nth-child(even) td { background: rgba(0, 0, 0, 0.015); }
+
+.table-view td.description {
+  max-width: 360px;
+  white-space: normal;
+  color: var(--text-muted);
+}
+
+.table-view td.empty {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* ============================================================
    Person cards
    ============================================================ */
 
