@@ -75,7 +75,7 @@ can be replaced with your own placeholder by overwriting the file.
     "partners": ["p1", "p2"],  // exactly two person IDs
     "married": "1968-05-10",
     "divorced": "1980-03-01",  // optional
-    "status": "divorced"       // married | divorced | widowed | partnered
+    "status": "divorced"       // married | divorced | partnered
   }
 ]
 ```

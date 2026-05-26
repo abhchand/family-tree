@@ -438,7 +438,6 @@ html, body {
 .connectors .union-line.married    { stroke-dasharray: none; }
 .connectors .union-line.partnered  { stroke-dasharray: none; }
 .connectors .union-line.divorced   { stroke-dasharray: 6 4; }
-.connectors .union-line.widowed    { stroke-dasharray: 2 4; }
 
 .connectors .union-dot {
   fill: #8a8073;
@@ -650,7 +649,6 @@ html, body {
   border-top: 1.5px solid #8a8073;
 }
 .line-dashed { border-top-style: dashed; }
-.line-dotted { border-top-style: dotted; }
 .line-adoptive { border-top-style: dashed; border-color: #9c7f5a; }
 
 /* ============================================================
