@@ -278,6 +278,14 @@ html, body {
   font-style: italic;
 }
 
+/* JSON-level null (key present, value is null) — call it out so the data
+   author can decide whether to remove the key or fill in a value. Listed
+   after the zebra-stripe rule above so it wins the cascade. */
+.table-view tbody tr td.null-value,
+.table-view tbody tr:nth-child(even) td.null-value {
+  background: rgba(243, 200, 75, 0.45);
+}
+
 /* ============================================================
    Person cards
    ============================================================ */

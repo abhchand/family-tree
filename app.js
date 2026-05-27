@@ -399,9 +399,14 @@
   // -----------------------------------------------------------
   // Table view — same set of people as the canvas, rendered as rows.
   // -----------------------------------------------------------
-  function appendCell(row, text, extraClass) {
+  function appendCell(row, text, extraClass, isNull) {
     const td = document.createElement('td');
-    if (text === '' || text == null) {
+    if (isNull) {
+      // The JSON has an explicit `null` here — flag it so the user can fix
+      // the data. (A simply-missing key falls through to the `.empty` branch.)
+      td.classList.add('null-value');
+      td.textContent = '—';
+    } else if (text === '' || text == null) {
       td.classList.add('empty');
       td.textContent = '—';
     } else {
@@ -429,24 +434,32 @@
         return a.name.localeCompare(b.name);
       });
 
+    // `key in p && p[key] === null` distinguishes "the JSON had an explicit
+    // null" from "the key was omitted entirely" — only the former should
+    // trigger the yellow highlight.
+    const isNull = (obj, key) => key in obj && obj[key] === null;
+
     for (const p of people) {
       const row = document.createElement('tr');
-      appendCell(row, p.name);
-      appendCell(row, p.nickname || '');
-      appendCell(row, p.maidenName || '');
-      appendCell(row, p.gender ? cap(p.gender) : '');
-      appendCell(row, p.born ? FamilyData.formatDate(p.born) : '');
+      appendCell(row, p.name, null, isNull(p, 'name'));
+      appendCell(row, p.nickname || '', null, isNull(p, 'nickname'));
+      appendCell(row, p.maidenName || '', null, isNull(p, 'maidenName'));
+      appendCell(row, p.gender ? cap(p.gender) : '', null, isNull(p, 'gender'));
+      appendCell(row, p.born ? FamilyData.formatDate(p.born) : '', null, isNull(p, 'born'));
 
       // All marriages this person is part of — even unions whose other
       // partner is currently hidden — joined on newlines (the cell uses
-      // `white-space: pre-line` so they stack vertically).
-      const marriages = FamilyData.getUnionsFor(p.id)
+      // `white-space: pre-line` so they stack vertically). The cell is
+      // flagged null if ANY of the person's unions has `"married": null`.
+      const unions = FamilyData.getUnionsFor(p.id);
+      const marriages = unions
         .map((u) => u.married && FamilyData.formatDate(u.married))
         .filter(Boolean);
-      appendCell(row, marriages.join('\n'));
+      const anyMarriageNull = unions.some((u) => isNull(u, 'married'));
+      appendCell(row, marriages.join('\n'), null, anyMarriageNull);
 
-      appendCell(row, p.died ? FamilyData.formatDate(p.died) : '');
-      appendCell(row, p.description || '', 'description');
+      appendCell(row, p.died ? FamilyData.formatDate(p.died) : '', null, isNull(p, 'died'));
+      appendCell(row, p.description || '', 'description', isNull(p, 'description'));
 
       tbody.appendChild(row);
     }
