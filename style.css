@@ -335,7 +335,6 @@ html, body {
 .card[data-gender="nonbinary"]{ background: var(--tint-nonbinary);border-color: var(--border-nonbinary); }
 
 .card.deceased {
-  filter: grayscale(0.85);
   opacity: 0.55;
 }
 .card.deceased .card-name {
@@ -358,7 +357,6 @@ html, body {
   border: 1px solid var(--border);
 }
 .panel-photo.deceased-photo {
-  filter: grayscale(0.85);
   opacity: 0.7;
 }
 
