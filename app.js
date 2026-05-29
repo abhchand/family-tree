@@ -313,7 +313,10 @@
     }
     const lower = q.trim().toLowerCase();
     const matches = FamilyData.allPeople()
-      .filter((p) => p.name.toLowerCase().includes(lower))
+      .filter((p) =>
+        p.name.toLowerCase().includes(lower) ||
+        (p.nickname && p.nickname.toLowerCase().includes(lower)),
+      )
       .slice(0, MAX_SEARCH_RESULTS);
 
     searchResults.innerHTML = '';
