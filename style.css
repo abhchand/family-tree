@@ -664,6 +664,10 @@ html, body {
   .side-panel {
     width: 100%;
   }
-  .toolbar-center { display: none; }
-  .brand { font-size: 16px; }
+  /* Keep the search visible; reclaim space by dropping the brand title and
+     tightening toolbar spacing so search + buttons still fit one row. */
+  .brand { display: none; }
+  .toolbar { padding: 0 10px; gap: 8px; }
+  .search-wrap { max-width: none; }
+  .toolbar-btn { padding: 7px 10px; }
 }
