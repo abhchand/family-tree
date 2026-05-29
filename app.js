@@ -671,6 +671,11 @@
     try {
       const data = await FamilyData.load();
 
+      // Total members in the dataset (not just the currently-visible subset).
+      const total = Object.keys(data.people).length;
+      document.getElementById('member-count').textContent =
+        `${total} ${total === 1 ? 'Person' : 'People'}`;
+
       // Resolve root: ?root= overrides, otherwise the first person in JSON.
       const peopleIds = Object.keys(data.people);
       const requested = getRequestedRootId();
