@@ -682,6 +682,12 @@
       currentRootId =
         (requested && data.people[requested]) ? requested : peopleIds[0];
 
+      // Show the current root's name in the bottom bar (truncated via CSS).
+      const rootName = data.people[currentRootId] && data.people[currentRootId].name;
+      const rootDisplay = document.getElementById('root-display');
+      rootDisplay.querySelector('.root-name').textContent = rootName || '—';
+      rootDisplay.title = rootName ? `Displaying: ${rootName}` : '';
+
       const displayed = computeDisplayedSet(data, currentRootId);
       currentDisplayed = displayed;
       const pills = computePills(data, displayed);

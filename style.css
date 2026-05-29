@@ -619,6 +619,7 @@ html, body {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-wrap: wrap;
 }
 .legend-toggle {
   padding: 7px 14px;
@@ -640,6 +641,22 @@ html, body {
   font-family: inherit;
   box-shadow: var(--shadow);
   white-space: nowrap;
+}
+.root-display {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  max-width: 220px;
+}
+.root-name {
+  display: inline-block;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+  color: var(--text);
+  font-weight: 500;
 }
 .legend-body {
   margin-top: 8px;
