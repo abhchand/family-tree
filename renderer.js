@@ -87,6 +87,13 @@ const FamilyRenderer = (() => {
       name.textContent = person.name;
       text.appendChild(name);
 
+      if (person.nickname) {
+        const nick = document.createElement('div');
+        nick.className = 'card-nick';
+        nick.textContent = `“${person.nickname}”`; // “nickname”
+        text.appendChild(nick);
+      }
+
       const life = document.createElement('div');
       life.className = 'card-life';
       life.textContent = FamilyData.lifespan(person);

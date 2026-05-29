@@ -395,6 +395,17 @@ html, body {
   text-overflow: ellipsis;
 }
 
+.card-nick {
+  margin-top: 1px;
+  font-size: 12px;
+  font-style: italic;
+  color: var(--text-muted);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .card-life {
   margin-top: 4px;
   font-size: 11px;
