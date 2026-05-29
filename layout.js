@@ -44,8 +44,8 @@
 
 const FamilyLayout = (() => {
   const ROW_H = 180;        // vertical spacing between generations
-  const CARD_W = 200;       // card pixel width
-  const CARD_H = 80;        // card pixel height
+  const CARD_W = 230;       // card pixel width (keep in sync with .card in style.css)
+  const CARD_H = 96;        // card pixel height (keep in sync with .card in style.css)
   const H_GAP = 60;         // horizontal gap between adjacent cards
   const SLOT_W = CARD_W + H_GAP; // 260 — width of one "slot" left-to-right
 
